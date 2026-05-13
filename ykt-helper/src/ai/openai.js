@@ -114,7 +114,7 @@ export async function queryAI(question, aiCfg) {
             ],
           },
         ],
-        temperature: 0.6,
+        temperature: 1,
       }),
       onload: (res) => {
         try {
@@ -230,7 +230,7 @@ async function singleStepVisionCall(profile, cleanBase64List, textPrompt, option
     {
       model: visionModel,
       messages,
-      temperature: 0.3,
+      temperature: 1,
     },
     '[AI OpenAI Vision 单步]',
     timeoutMs,
@@ -367,7 +367,7 @@ export async function queryAIVision(imageBase64, textPrompt, aiCfg, options = {}
       {
         model: visionModel,
         messages: step1Messages,
-        temperature: 0.1,
+        temperature: 1,
       },
       '[AI OpenAI Vision Step1]',
       timeoutMs,
@@ -494,7 +494,7 @@ export async function queryAIVision(imageBase64, textPrompt, aiCfg, options = {}
       {
         model: textModel,
         messages: step2Messages,
-        temperature: 0.2,
+        temperature: 1,
       },
       '[AI OpenAI Vision Step2]',
       timeoutMs,

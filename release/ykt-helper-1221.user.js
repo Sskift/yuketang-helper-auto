@@ -698,7 +698,7 @@
               text: [ "【文本模式说明】可能为题目文本，也可能为普通问答。请先执行决策闸，再回答。", "【用户输入（优先级最高）】", question || "（无）" ].join("\n")
             } ]
           } ],
-          temperature: .6
+          temperature: 1
         }),
         onload: res => {
           try {
@@ -787,7 +787,7 @@
     const data = await chatCompletion(profile, {
       model: visionModel,
       messages: messages,
-      temperature: .3
+      temperature: 1
     }, "[AI OpenAI Vision 单步]", timeoutMs);
     const content = data.choices?.[0]?.message?.content;
     if (!content) throw new Error("AI返回内容为空");
@@ -846,7 +846,7 @@
       const data1 = await chatCompletion(profile, {
         model: visionModel,
         messages: step1Messages,
-        temperature: .1
+        temperature: 1
       }, "[AI OpenAI Vision Step1]", timeoutMs);
       const content1 = data1.choices?.[0]?.message?.content || "";
       if (twoStepDebug) console.log("[雨课堂助手][DEBUG][vision-step1] raw content:", content1);
@@ -919,7 +919,7 @@
       const data2 = await chatCompletion(profile, {
         model: textModel,
         messages: step2Messages,
-        temperature: .2
+        temperature: 1
       }, "[AI OpenAI Vision Step2]", timeoutMs);
       const content2 = data2.choices?.[0]?.message?.content || "";
       if (!content2) throw new Error("AI返回内容为空");

@@ -70,7 +70,7 @@ export async function queryKimi(question, aiCfg) {
                         ]
                     }
                 ],
-                temperature: 0.6
+                temperature: 1
             }),
             onload: (res) => {
                 try {
@@ -167,7 +167,7 @@ export async function queryKimiVision(imageBase64, textPrompt, aiCfg) {
             data: JSON.stringify({
                 model: 'moonshot-v1-8k-vision-preview', // ✅ 使用 Vision 专用模型
                 messages: messages,
-                temperature: 0.3, // ✅ 根据文档示例调整
+                temperature: 1, // ✅ 根据文档示例调整
                 // 不需要 max_tokens，文档中没有提到
             }),
             onload: (res) => {
