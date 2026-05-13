@@ -3,6 +3,7 @@ import tpl from './settings.html';
 import { ui } from '../ui-api.js';
 import { DEFAULT_CONFIG } from '../../core/types.js';
 import { storage } from '../../core/storage.js';
+import { gm } from '../../core/env.js';
 
 let mounted = false;
 let root;
@@ -331,6 +332,77 @@ export function mountSettingsPanel() {
         options: [],
       };
       ui.notifyProblem(mockProblem, { thumbnail: null });
+    });
+  }
+
+  // 测试 API 连通性
+  const $btnTestApi = root.querySelector('#ykt-btn-test-api');
+  const $testResult = root.querySelector('#ykt-api-test-result');
+  if ($btnTestApi && $testResult) {
+    $btnTestApi.addEventListener('click', () => {
+      const url = ($baseUrl.value || '').trim();
+      const key = ($api.value || '').trim();
+      const model = ($model.value || '').trim();
+
+      if (!url || !key) {
+        $testResult.textContent = '请先填写 URL 和 API Key';
+        $testResult.style.color = '#b00020';
+        return;
+      }
+
+      $testResult.textContent = '测试中...';
+      $testResult.style.color = '#856404';
+      $btnTestApi.disabled = true;
+
+      gm.xhr({
+        method: 'POST',
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${key}`,
+        },
+        data: JSON.stringify({
+          model: model || 'gpt-4o-mini',
+          messages: [{ role: 'user', content: 'Hi' }],
+          max_tokens: 5,
+        }),
+        timeout: 15000,
+        onload: (res) => {
+          $btnTestApi.disabled = false;
+          try {
+            if (res.status === 200) {
+              const data = JSON.parse(res.responseText);
+              const usedModel = data.model || model || '未知';
+              $testResult.textContent = `连接成功 (${usedModel})`;
+              $testResult.style.color = '#0a7a2f';
+            } else if (res.status === 401 || res.status === 403) {
+              $testResult.textContent = 'API Key 无效 (' + res.status + ')';
+              $testResult.style.color = '#b00020';
+            } else {
+              let msg = `请求失败 (${res.status})`;
+              try {
+                const err = JSON.parse(res.responseText);
+                if (err.error?.message) msg += ': ' + err.error.message;
+              } catch {}
+              $testResult.textContent = msg;
+              $testResult.style.color = '#b00020';
+            }
+          } catch (e) {
+            $testResult.textContent = '解析响应失败: ' + e.message;
+            $testResult.style.color = '#b00020';
+          }
+        },
+        onerror: () => {
+          $btnTestApi.disabled = false;
+          $testResult.textContent = '网络请求失败，请检查 URL';
+          $testResult.style.color = '#b00020';
+        },
+        ontimeout: () => {
+          $btnTestApi.disabled = false;
+          $testResult.textContent = '请求超时 (15s)';
+          $testResult.style.color = '#b00020';
+        },
+      });
     });
   }
 

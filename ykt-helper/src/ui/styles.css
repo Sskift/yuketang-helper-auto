@@ -241,6 +241,45 @@
 #ykt-problem-list .problem-actions button:hover{ background: #eef3ff; border-color: var(--ykt-accent); }
 #ykt-problem-list .problem-done{ color: #0a7a2f; font-weight: 600; }
 
+/* 题目列表 - 答题输入区 */
+#ykt-problem-list .editor-box{ margin-top: 8px; }
+#ykt-problem-list .editor-box .label{ font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #333; }
+#ykt-problem-list .retry-options-group{ display: flex; flex-direction: column; gap: 4px; margin: 6px 0; }
+#ykt-problem-list .retry-option-label{
+  display: flex; align-items: center; gap: 6px; padding: 5px 8px;
+  border: 1px solid var(--ykt-border); border-radius: 6px; background: #fff; cursor: pointer;
+  font-size: 13px; transition: border-color .15s;
+}
+#ykt-problem-list .retry-option-label:hover{ border-color: var(--ykt-accent); background: #f0f4ff; }
+#ykt-problem-list .retry-option-label input{ margin: 0; }
+#ykt-problem-list .retry-text-input{
+  width: 100%; height: 32px; border: 1px solid var(--ykt-border-strong);
+  border-radius: 6px; padding: 0 10px; font-size: 13px; box-sizing: border-box;
+}
+#ykt-problem-list .retry-subjective-input{
+  width: 100%; border: 1px solid var(--ykt-border-strong);
+  border-radius: 6px; padding: 8px; font-size: 13px; box-sizing: border-box; resize: vertical;
+}
+#ykt-problem-list .retry-adv-toggle{
+  font-size: 12px; color: var(--ykt-muted); cursor: pointer; margin: 8px 0 4px; user-select: none;
+}
+#ykt-problem-list .retry-adv-toggle:hover{ color: var(--ykt-accent); }
+#ykt-problem-list .retry-adv-box{ margin-bottom: 6px; }
+#ykt-problem-list .retry-json-textarea{
+  width: 100%; border: 1px solid var(--ykt-border-strong);
+  border-radius: 6px; padding: 8px; font-size: 12px; font-family: monospace;
+  box-sizing: border-box; resize: vertical; background: #f7f8fa;
+}
+#ykt-problem-list .submit-bar{ display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+#ykt-problem-list .submit-bar button{
+  height: 30px; padding: 0 14px; border-radius: 6px;
+  border: 1px solid var(--ykt-border-strong); background: #f7f8fa; cursor: pointer; font-size: 13px;
+}
+#ykt-problem-list .submit-bar button:hover{ background: #eef3ff; border-color: var(--ykt-accent); }
+#ykt-problem-list .submit-bar button:disabled{ opacity: .5; cursor: not-allowed; }
+#ykt-problem-list .retry-ai-btn{ background: #e8f0fe !important; color: var(--ykt-accent); font-weight: 500; }
+#ykt-problem-list .retry-ai-btn:hover{ background: #d2e3fc !important; }
+
 /* ===== 活动题目列表（右下角小卡片） ===== */
 #ykt-active-problems-panel.ykt-active-wrapper{
   position: fixed; right: 20px; bottom: 60px; z-index: var(--ykt-z);
