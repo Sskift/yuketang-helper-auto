@@ -2936,12 +2936,6 @@
   function sleep(ms) {
     return new Promise(r => setTimeout(r, Math.max(0, ms | 0)));
   }
-  // problemId 可能超过 Number.MAX_SAFE_INTEGER，Number() 会丢精度
-  // 保留原始值，JSON 序列化后把带引号的纯数字 ID 替换为裸数字
-    function safeStringify(data) {
-    const json = JSON.stringify(data);
-    return json.replace(/"problemId":"(\d+)"/g, '"problemId":$1');
-  }
   function calcAutoWaitMs() {
     const base = Math.max(0, ui?.config?.autoAnswerDelay ?? 0);
     const rand = Math.max(0, ui?.config?.autoAnswerRandomDelay ?? 0);
@@ -2981,7 +2975,7 @@
           }
         };
         xhr.onerror = () => reject(new Error("网络请求失败"));
-        xhr.send(safeStringify(data));
+        xhr.send(JSON.stringify(data));
       } catch (e) {
         reject(e);
       }
@@ -3000,7 +2994,7 @@
       ...options.headers || {}
     };
     const payload = {
-      problemId: problem.problemId,
+      problemId: Number(problem.problemId) || problem.problemId,
       problemType: Number(problem.problemType) || problem.problemType,
       dt: options.dt ?? Date.now(),
       result: result
@@ -3024,22 +3018,24 @@
     };
     const payload = {
       problems: [ {
-        problemId: problem.problemId,
+        problemId: Number(problem.problemId) || problem.problemId,
         problemType: Number(problem.problemType) || problem.problemType,
         dt: dt,
         result: result
       } ]
     };
+    console.log("[雨课堂助手][DEBUG][retryAnswer] 发送 payload:", JSON.stringify(payload));
+    console.log("[雨课堂助手][DEBUG][retryAnswer] 原始 problemId:", problem.problemId, typeof problem.problemId);
+    console.log("[雨课堂助手][DEBUG][retryAnswer] Number() 后:", Number(problem.problemId));
     const resp = await xhrPost(url, payload, headers);
-    console.log("[雨课堂助手][DEBUG][retryAnswer] 完整服务器响应:", JSON.stringify(resp));
-    console.log("[雨课堂助手][DEBUG][retryAnswer] 发送的 payload:", JSON.stringify(payload));
+    console.log("[雨课堂助手][DEBUG][retryAnswer] 服务器响应:", JSON.stringify(resp));
     if (resp.code !== 0) throw new Error(`${resp.msg} (${resp.code})`);
     const okList = resp?.data?.success || [];
     const pid = problem.problemId;
-    if (!Array.isArray(okList) || !okList.some(id => String(id) === String(pid))) console.warn("[雨课堂助手][WARN][retryAnswer] success 列表不含当前 problemId（简答题可能正常）", {
+    if (!Array.isArray(okList) || !okList.some(id => String(id) === String(pid))) console.warn("[雨课堂助手][WARN][retryAnswer] success 列表不含当前 problemId（可能正常）", {
       okList: okList,
       pid: pid,
-      fullData: resp.data
+      fullResp: resp
     });
     return resp;
   }
@@ -3057,7 +3053,7 @@
    * @param {Record<string,string>} [submitOptions.headers] - extra/override headers.
    * @returns {Promise<{'route':'answer'|'retry', resp:any}>}
    * @param {number|string} [submitOptions.lessonId] - 所属课堂；缺省时将使用 repo.currentLessonId
-   * @param {boolean} [submitOptions.autoGate=true]  - 是否启用“自动进入课堂/默认自动答题”的判定（向后兼容，默认开启）
+   * @param {boolean} [submitOptions.autoGate=true]  - 是否启用"自动进入课堂/默认自动答题"的判定（向后兼容，默认开启）
    * @param {number} [submitOptions.waitMs]          - 覆盖自动等待时间；未提供时按设置计算
    */  async function submitAnswer(problem, result, submitOptions = {}) {
     const startTime = submitOptions?.startTime;
@@ -3103,7 +3099,7 @@
         dt = Date.now() - off;
         console.log("补交 dt = fallback =", dt);
       }
-      console.log(">>> 即将调用 retryAnswer()");
+      console.log(">>> 即将调用 retryAnswer(), result=", JSON.stringify(result));
       console.groupEnd();
       try {
         const resp = await retryAnswer(problem, result, dt, {
