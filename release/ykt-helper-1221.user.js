@@ -2994,8 +2994,8 @@
       ...options.headers || {}
     };
     const payload = {
-      problemId: problem.problemId,
-      problemType: problem.problemType,
+      problemId: Number(problem.problemId) || problem.problemId,
+      problemType: Number(problem.problemType) || problem.problemType,
       dt: options.dt ?? Date.now(),
       result: result
     };
@@ -3018,16 +3018,24 @@
     };
     const payload = {
       problems: [ {
-        problemId: problem.problemId,
-        problemType: problem.problemType,
+        problemId: Number(problem.problemId) || problem.problemId,
+        problemType: Number(problem.problemType) || problem.problemType,
         dt: dt,
         result: result
       } ]
     };
     const resp = await xhrPost(url, payload, headers);
+    console.log("[雨课堂助手][DEBUG][retryAnswer] 服务器响应:", JSON.stringify(resp));
     if (resp.code !== 0) throw new Error(`${resp.msg} (${resp.code})`);
     const okList = resp?.data?.success || [];
-    if (!Array.isArray(okList) || !okList.includes(problem.problemId)) throw new Error("服务器未返回成功信息");
+    const pid = problem.problemId;
+    if (!Array.isArray(okList) || !okList.some(id => String(id) === String(pid))) {
+      console.warn("[雨课堂助手][WARN][retryAnswer] success 列表不含当前 problemId", {
+        okList: okList,
+        pid: pid
+      });
+      throw new Error("服务器未返回成功信息");
+    }
     return resp;
   }
   /**
