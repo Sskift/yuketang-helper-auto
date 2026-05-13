@@ -3493,10 +3493,7 @@
         const val = textarea.value.trim();
         return val ? {
           content: val,
-          pics: [ {
-            pic: ""
-          } ],
-          videos: []
+          pics: []
         } : null;
       };
     }

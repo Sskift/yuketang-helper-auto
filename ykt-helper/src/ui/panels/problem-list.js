@@ -381,7 +381,7 @@ function updateRow(row, e, prob){
 
     getResultFromInputs = () => {
       const val = textarea.value.trim();
-      return val ? { content: val, pics: [{ pic: '' }], videos: [] } : null;
+      return val ? { content: val, pics: [] } : null;
     };
   }
 
