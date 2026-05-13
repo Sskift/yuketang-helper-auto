@@ -2936,6 +2936,12 @@
   function sleep(ms) {
     return new Promise(r => setTimeout(r, Math.max(0, ms | 0)));
   }
+  // problemId 可能超过 Number.MAX_SAFE_INTEGER，Number() 会丢精度
+  // 保留原始值，JSON 序列化后把带引号的纯数字 ID 替换为裸数字
+    function safeStringify(data) {
+    const json = JSON.stringify(data);
+    return json.replace(/"problemId":"(\d+)"/g, '"problemId":$1');
+  }
   function calcAutoWaitMs() {
     const base = Math.max(0, ui?.config?.autoAnswerDelay ?? 0);
     const rand = Math.max(0, ui?.config?.autoAnswerRandomDelay ?? 0);
@@ -2975,7 +2981,7 @@
           }
         };
         xhr.onerror = () => reject(new Error("网络请求失败"));
-        xhr.send(JSON.stringify(data));
+        xhr.send(safeStringify(data));
       } catch (e) {
         reject(e);
       }
@@ -2994,7 +3000,7 @@
       ...options.headers || {}
     };
     const payload = {
-      problemId: Number(problem.problemId) || problem.problemId,
+      problemId: problem.problemId,
       problemType: Number(problem.problemType) || problem.problemType,
       dt: options.dt ?? Date.now(),
       result: result
@@ -3018,7 +3024,7 @@
     };
     const payload = {
       problems: [ {
-        problemId: Number(problem.problemId) || problem.problemId,
+        problemId: problem.problemId,
         problemType: Number(problem.problemType) || problem.problemType,
         dt: dt,
         result: result
