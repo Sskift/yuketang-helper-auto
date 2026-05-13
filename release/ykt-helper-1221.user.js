@@ -3025,17 +3025,16 @@
       } ]
     };
     const resp = await xhrPost(url, payload, headers);
-    console.log("[雨课堂助手][DEBUG][retryAnswer] 服务器响应:", JSON.stringify(resp));
+    console.log("[雨课堂助手][DEBUG][retryAnswer] 完整服务器响应:", JSON.stringify(resp));
+    console.log("[雨课堂助手][DEBUG][retryAnswer] 发送的 payload:", JSON.stringify(payload));
     if (resp.code !== 0) throw new Error(`${resp.msg} (${resp.code})`);
     const okList = resp?.data?.success || [];
     const pid = problem.problemId;
-    if (!Array.isArray(okList) || !okList.some(id => String(id) === String(pid))) {
-      console.warn("[雨课堂助手][WARN][retryAnswer] success 列表不含当前 problemId", {
-        okList: okList,
-        pid: pid
-      });
-      throw new Error("服务器未返回成功信息");
-    }
+    if (!Array.isArray(okList) || !okList.some(id => String(id) === String(pid))) console.warn("[雨课堂助手][WARN][retryAnswer] success 列表不含当前 problemId（简答题可能正常）", {
+      okList: okList,
+      pid: pid,
+      fullData: resp.data
+    });
     return resp;
   }
   /**
@@ -3493,7 +3492,10 @@
         const val = textarea.value.trim();
         return val ? {
           content: val,
-          pics: []
+          pics: [ {
+            pic: ""
+          } ],
+          videos: []
         } : null;
       };
     }
